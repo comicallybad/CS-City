@@ -1,0 +1,52 @@
+{
+  "name": "cs-city",
+  "version": "1.0.0",
+  "description": "Discord Bot",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ComicallyBad/CS-City.git"
+  },
+  "keywords": [
+    "discordbot",
+    "discord",
+    "bot",
+    "discord.js",
+    "discordjs",
+    "automoderation",
+    "info",
+    "information",
+    "informational",
+    "music",
+    "musicplayer",
+    "lavalink",
+    "youtube",
+    "soundcloud",
+    "selection-roles",
+    "selectionroles",
+    "welcomer",
+    "welcoming"
+  ],
+  "author": "ComicallyBad",
+  "license": "GNU GPLv3",
+  "funding": {
+    "type": "individual",
+    "url": "https://linktr.ee/ComicallyBad"
+  },
+  "bugs": {
+    "url": "https://github.com/ComicallyBad/CS-City/issues"
+  },
+  "homepage": "https://ComicallyBad.github.io/",
+  "dependencies": {
+    "ascii-table": "^0.0.9",
+    "beautify": "^0.0.8",
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.3.1",
+    "erela.js": "^2.4.0",
+    "humanize-duration": "^3.31.0",
+    "mongoose": "^8.0.2"
+  }
+}
