@@ -41,12 +41,14 @@
   },
   "homepage": "https://ComicallyBad.github.io/",
   "dependencies": {
+    "@vitalets/google-translate-api": "^9.2.0",
     "ascii-table": "^0.0.9",
     "beautify": "^0.0.8",
     "discord.js": "^14.14.1",
     "dotenv": "^16.3.1",
     "erela.js": "^2.4.0",
     "humanize-duration": "^3.31.0",
-    "mongoose": "^8.0.2"
+    "mongoose": "^8.0.2",
+    "word-definition": "^2.1.6"
   }
 }
