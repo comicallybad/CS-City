@@ -6,7 +6,7 @@ module.exports = {
         const guilds = client.guilds.cache.map(guild => ({ id: guild.id, name: guild.name }));
 
         await Promise.all(guilds.map(async guild => {
-            const exists = await db.findOne({ guildID: guild.id }).catch(err => err);
+            let exists = await db.findOne({ guildID: guild.id }).catch(err => err);
             if (!exists) {
                 exists = new db({
                     _id: new mongoose.Types.ObjectId(),
