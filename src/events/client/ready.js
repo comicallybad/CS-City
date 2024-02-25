@@ -14,6 +14,4 @@ module.exports = client => {
         console.log("Successfully connected to Mongodb");
         dbSetup(client);
     });
-
-    client.music.init(process.env.CLIENTID);
 }

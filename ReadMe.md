@@ -23,8 +23,8 @@ To clone and use the CS-City Bot, follow these steps:
 5. Create an `application.yml` file inside the lavalink folder. An example can be found [here](https://github.com/lavalink-devs/Lavalink/blob/master/LavalinkServer/application.yml.example)
 6. Create a `.env` file with:
     - `TOKEN` for a discord token, 
-    - `ERELA` for a Lavalink/erela password, 
     - `USERID` for your Discord Dev ID
+    - `STEAM` for your Steam API key
 7. Run `npm i --save` to install the necessary packages.
 8. Use `start.bat` to run the bot.
 
@@ -50,6 +50,5 @@ For help understanding the code and technologies used in this project, you can r
 - **Discord.js Guide**: [Discord.js Guide](https://discordjs.guide/#before-you-begin)
 - **Discord.js Documentation**: [Discord.js Documentation](https://discord.js.org)
 - **Lavalink Documentation**: [Lavalink Documentation](https://github.com/lavalink-devs/Lavalink?tab=readme-ov-file#lavalink)
-- **MenuDocs Erela.js Guide**: [MenuDocs Erela.js Guide](https://guides.menudocs.org/topics/erelajs/)
 
-These resources provide comprehensive guides and documentation to help you understand and use JavaScript, Discord.js, Lavalink, and Erela.js effectively.
+These resources provide comprehensive guides and documentation to help you understand and use JavaScript, and Discord.js effectively.
