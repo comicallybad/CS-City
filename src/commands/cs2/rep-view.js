@@ -7,7 +7,7 @@ module.exports = {
         .setName("rep")
         .setDescription("View a steam accounts csgo-rep.com reputation.")
         .addSubcommand(subcommand => subcommand.setName("view").setDescription("View a steam accounts csgo-rep.com reputation.")
-            .addStringOption(option => option.setName("steam").setDescription("The Steam ID or vanity URL of the account to view.").setRequired(true))),
+            .addStringOption(option => option.setName("steam").setDescription("The Steam ID, Vanity URL, or Trade URL of the account to view.").setRequired(true))),
     execute: async (interaction) => {
         const input = interaction.options.getString("steam");
         const steamID = await getSteamID(input);
@@ -98,6 +98,15 @@ async function getSteamID(input) {
         if (res.data.response.steamid)
             return res.data.response.steamid;
         else return null;
+    } else if (input.includes("steamcommunity.com/tradeoffer/new/?partner=")) {
+        const tradeUrl = input;
+        const accountId = new URL(tradeUrl).searchParams.get('partner');
+        const universe = BigInt(1);
+        const type = BigInt(1);
+        const instance = BigInt(1);
+
+        const steamID64 = (universe << BigInt(56)) | (type << BigInt(52)) | (instance << BigInt(32)) | BigInt(accountId);
+        return steamID64.toString();
     } else return null;
 }
 
