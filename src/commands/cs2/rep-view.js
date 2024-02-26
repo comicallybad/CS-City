@@ -15,14 +15,16 @@ module.exports = {
         if (!steamID)
             return re(interaction, "Invalid Steam ID or vanity URL.", null).then(() => delr(interaction, 30000));
 
-        const steam = await getSteamProfile(steamID);
+        const [steam, steamLevel, checkBan, reputation] = await Promise.all([
+            getSteamProfile(steamID),
+            getSteamLevel(steamID),
+            getBanStatus(steamID),
+            getReputation(steamID)
+        ]);
 
         if (!steam)
             return re(interaction, "Invalid Steam ID or vanity URL.", null).then(() => delr(interaction, 30000));
 
-        const steamLevel = await getSteamLevel(steamID);
-        const checkBan = await getBanStatus(steamID);
-        const reputation = await getReputation(steamID);
         const positiveReps = reputation.data.filter(rep => rep.rate === 1).length;
         const neuutralReps = reputation.data.filter(rep => rep.rate === 0).length;
         const embed = new EmbedBuilder()
@@ -69,7 +71,7 @@ module.exports = {
                         } else if (rep.trade_position === 2) {
                             position = ' (2nd)';
                         }
-                        return `${rep.rate === 1 ? "+" : "-"} ${rep.body}${position}`;
+                        return `${rep.rate === 1 ? "+" : "-"}${position} ${rep.body}`;
                     }).join("\n")}\`\`\``
                 })
             } else {
