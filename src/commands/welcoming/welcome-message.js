@@ -29,7 +29,7 @@ function getWelcomeMessage(interaction, dbResult) {
 
 async function setWelcomeMessage(interaction, dbResult) {
     const modal = new ModalBuilder()
-        .setCustomId("welcome")
+        .setCustomId(`welcome-${interaction.id}`)
         .setTitle("Welcome Message")
 
     const textInput = new TextInputBuilder()
@@ -46,38 +46,38 @@ async function setWelcomeMessage(interaction, dbResult) {
     await interaction.showModal(modal)
 
     const submitted = await interaction.awaitModalSubmit({
-        time: 60000,
-        filter: i => i.user.id === interaction.user.id
-    });
+        time: 30000,
+        filter: i => i.user.id === interaction.user.id && i.customId.includes(interaction.id)
+    }).catch(err => err);
 
-    if (submitted) {
-        const newMessage = submitted.fields.getTextInputValue("welcome-input")
+    if (!submitted.fields) return;
 
-        if (dbResult) {
-            dbResult.welcomeMessage = newMessage;
-            await dbResult.save();
-        }
+    const newMessage = submitted.fields.getTextInputValue("welcome-input")
 
-        const logChannel = interaction.guild.channels.cache.find(c => c.name.includes("mod-logs")) || interaction.channel;
-        const embed = new EmbedBuilder()
-            .setColor("#0efefe")
-            .setTitle("Welcome Message Changed")
-            .setThumbnail(interaction.user.displayAvatarURL())
-            .setFooter({ text: interaction.member.displayName, iconURL: interaction.user.displayAvatarURL() })
-            .setTimestamp()
-            .addFields({
-                name: '__**Message**__',
-                value: `${newMessage}`,
-                inline: true
-            }, {
-                name: '__**Moderator**__',
-                value: `${interaction.user}`,
-                inline: true
-            });
-
-        s(logChannel, '', embed);
-        return re(submitted, `The welcome message has been changed to: ${newMessage}`).then(() => delr(submitted, 7500));
+    if (dbResult) {
+        dbResult.welcomeMessage = newMessage;
+        await dbResult.save();
     }
+
+    const logChannel = interaction.guild.channels.cache.find(c => c.name.includes("mod-logs")) || interaction.channel;
+    const embed = new EmbedBuilder()
+        .setColor("#0efefe")
+        .setTitle("Welcome Message Changed")
+        .setThumbnail(interaction.user.displayAvatarURL())
+        .setFooter({ text: interaction.member.displayName, iconURL: interaction.user.displayAvatarURL() })
+        .setTimestamp()
+        .addFields({
+            name: '__**Message**__',
+            value: `${newMessage}`,
+            inline: true
+        }, {
+            name: '__**Moderator**__',
+            value: `${interaction.user}`,
+            inline: true
+        });
+
+    s(logChannel, '', embed);
+    return re(submitted, `The welcome message has been changed to: ${newMessage}`).then(() => delr(submitted, 7500));
 }
 
 async function removeWelcomeMessage(interaction, dbResult) {

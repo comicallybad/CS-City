@@ -12,7 +12,7 @@ module.exports = {
         const channel = interaction.options.getChannel("channel") || interaction.channel;
 
         const modal = new ModalBuilder()
-            .setCustomId("announcement")
+            .setCustomId(`announcement-${interaction.id}`)
             .setTitle("Announcement Message")
 
         const textInput = new TextInputBuilder()
@@ -29,14 +29,14 @@ module.exports = {
         await interaction.showModal(modal)
 
         const submitted = await interaction.awaitModalSubmit({
-            time: 60000,
-            filter: i => i.user.id === interaction.user.id
-        });
+            time: 30000,
+            filter: i => i.user.id === interaction.user.id && i.customId.includes(interaction.id)
+        }).catch(err => err);
 
-        if (submitted) {
-            const announcement = submitted.fields.getTextInputValue("announcement-input")
-            await re(submitted, "Announcement sent.").then(() => delr(submitted, 30000));
-            return s(channel, `${announcement}`);
-        }
+        if (!submitted.fields) return;
+
+        const announcement = submitted.fields.getTextInputValue("announcement-input")
+        await re(submitted, "Announcement sent.").then(() => delr(submitted, 30000));
+        return s(channel, `${announcement}`);
     }
 }
