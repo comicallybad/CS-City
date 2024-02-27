@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { s, re, delr } = require("../../../utils/functions/functions.js");
 
 
@@ -7,13 +7,36 @@ module.exports = {
         .setName("announce")
         .setDescription("Make an announcement to a channel.")
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
-        .addStringOption(option => option.setName("message").setDescription("The message to send.").setMaxLength(2000).setRequired(true))
-        .addChannelOption(option => option.setName("channel").setDescription("The channel to send the announcement to.").setRequired(false)),
-    execute: (interaction) => {
-        const message = interaction.options.getString("message");
+        .addChannelOption(option => option.setName("channel").setDescription("The channel to send the announcement to.")),
+    execute: async (interaction) => {
         const channel = interaction.options.getChannel("channel") || interaction.channel;
 
-        re(interaction, "Announcement sent.").then(() => delr(interaction, 30000));
-        return s(channel, `${message}`);
+        const modal = new ModalBuilder()
+            .setCustomId("announcement")
+            .setTitle("Announcement Message")
+
+        const textInput = new TextInputBuilder()
+            .setCustomId("announcement-input")
+            .setLabel("Announcement Message")
+            .setPlaceholder("Enter the announcement message here.")
+            .setMaxLength(2000)
+            .setStyle(TextInputStyle.Paragraph)
+            .setRequired(true)
+
+        const actionRow = new ActionRowBuilder().addComponents(textInput);
+        modal.addComponents(actionRow);
+
+        await interaction.showModal(modal)
+
+        const submitted = await interaction.awaitModalSubmit({
+            time: 60000,
+            filter: i => i.user.id === interaction.user.id
+        });
+
+        if (submitted) {
+            const announcement = submitted.fields.getTextInputValue("announcement-input")
+            await re(submitted, "Announcement sent.").then(() => delr(submitted, 30000));
+            return s(channel, `${announcement}`);
+        }
     }
 }
