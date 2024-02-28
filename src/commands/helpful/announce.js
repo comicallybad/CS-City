@@ -1,7 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { s, re, delr } = require("../../../utils/functions/functions.js");
 
-
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("announce")
