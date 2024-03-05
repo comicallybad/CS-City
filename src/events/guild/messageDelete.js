@@ -23,10 +23,6 @@ module.exports = async (client, message) => {
             name: "__**Channel**__",
             value: `${message.channel}`,
             inline: true,
-        }, {
-            name: "__**Message**__",
-            value: `[View Message](${message.url})`,
-            inline: true,
         })
         .setDescription(message.content && message.content.length <= 1020 ? message.content : message.content ? message.content.substring(0, 1020) + "`...`" : "No content")
 
