@@ -1,181 +1,86 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits } = require("discord.js");
-const { s, r, re, er, delr, messagePrompt, pageList } = require("../../../utils/functions/functions.js");
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
+const { s, re, delr } = require("../../../utils/functions/functions.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("role")
-        .setDescription("Add, remove, view information, or view users from a role from a role.")
-        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
-        .addSubcommand(subcommand => subcommand.setName("add").setDescription("Add a role to a member.")
-            .addUserOption(option => option.setName("user").setDescription("The user to add/remove the role from.").setRequired(true))
-            .addRoleOption(option => option.setName("role").setDescription("The role to add/remove from the user.").setRequired(true)))
-        .addSubcommand(subcommand => subcommand.setName("remove").setDescription("Remove a role from a member.")
-            .addUserOption(option => option.setName("user").setDescription("The user to add/remove the role from.").setRequired(true))
-            .addRoleOption(option => option.setName("role").setDescription("The role to add/remove from the user.").setRequired(true)))
-        .addSubcommand(subCommand => subCommand.setName("info").setDescription("Get information about a role.")
-            .addRoleOption(option => option.setName("role").setDescription("The role to get information about.").setRequired(true)))
-        .addSubcommand(subCommand => subCommand.setName("users").setDescription("Get a list of users with a role.")
-            .addRoleOption(option => option.setName("role").setDescription("The role to get a list of users from.").setRequired(true))),
+        .setDescription("SERVER BOOSTERS - Create your own role.")
+        .addStringOption(option => option.setName("name").setDescription("The name of the role.").setMinLength(1).setMaxLength(64).setRequired(true))
+        .addStringOption(option => option.setName("color").setDescription("The hex color of the role.").setRequired(true))
+        .addStringOption(option => option.setName("emoji").setDescription("The unicode emoji of the role."))
+        .addStringOption(option => option.setName("icon").setDescription("The icon URL of the role.")),
     execute: async (interaction) => {
-        const subcommand = interaction.options.getSubcommand();
+        if (!interaction.member.permissions.has(PermissionFlagsBits.ManageRoles) && !interaction.member.roles.cache.find(role => role.name.includes("Server Booster")))
+            return re(interaction, "You don't have permission to manage roles.").then(() => delr(interaction, 15000));
 
-        switch (subcommand) {
-            case "add":
-                return handleAddRemove(interaction);
-            case "remove":
-                return handleAddRemove(interaction);
-            case "info":
-                return handleInfo(interaction);
-            case "users":
-                return handleUsers(interaction);
-        }
-    }
-}
+        const name = interaction.options.getString("name");
+        const color = interaction.options.getString("color");
+        const emoji = interaction.options.getString("emoji") || undefined;
+        const icon = interaction.options.getString("icon") || undefined;
+        const logChannel = interaction.guild.channels.cache.find(channel => channel.name.includes("member-logs"));
 
-async function handleAddRemove(interaction) {
-    if (!interaction.guild.members.me.permissions.has(PermissionFlagsBits.ManageRoles))
-        return re(interaction, "I don't have permission to MANAGE ROLES!").then(() => delr(interaction, 15000));
+        if (!color.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/))
+            return re(interaction, "Invalid hex color.").then(() => delr(interaction, 15000));
 
-    const subCommand = interaction.options.getSubcommand();
-    const member = interaction.options.getMember("user");
-    const role = interaction.options.getRole("role");
-
-    if (member.id === interaction.user.id || member.id === interaction.guild.members.me.id)
-        return re(interaction, "I can't perform this action.").then(() => delr(interaction, 15000));
-
-    const promptEmbed = new EmbedBuilder()
-        .setColor("#00ff00")
-        .setAuthor({ name: `This verification becomes invalid after 30s.`, iconURL: interaction.user.displayAvatarURL() })
-        .setDescription(`Do you want to ${subCommand} ${role} from ${member}?`);
-
-    const row = new ActionRowBuilder()
-        .addComponents(
-            new ButtonBuilder().setCustomId("✅").setLabel("Confirm").setStyle(ButtonStyle.Success),
-            new ButtonBuilder().setCustomId("❌").setLabel("Cancel").setStyle(ButtonStyle.Danger)
-        );
-
-    await re(interaction, "", promptEmbed)
-
-    const collectedInteraction = await messagePrompt(interaction, row, 30000);
-
-    if (collectedInteraction.customId === "❌")
-        return er(interaction, "Selection cancelled.", [], []).then(() => delr(interaction, 15000))
-
-    if (collectedInteraction.customId === "✅") {
         try {
-            if (subCommand === "add")
-                return await addRole(interaction, member, role);
-            else if (subCommand === "remove")
-                return await removeRole(interaction, member, role);
+            const role = await interaction.guild.roles.create({
+                name: name,
+                color: color,
+                permissions: [],
+                mentionable: false,
+                hoist: false,
+                position: interaction.member.roles.highest.position - 1,
+                reason: `Server Booster role created by ${interaction.user.tag} | ${interaction.user.id}.`
+            });
+
+            if (!role)
+                return re(interaction, "An error occurred while creating the role.").then(() => delr(interaction, 15000));
+
+            try {
+                if (emoji) await role.setUnicodeEmoji(emoji);
+                if (icon) await role.setIcon(icon);
+
+                await interaction.member.roles.add(role);
+
+                const embed = new EmbedBuilder()
+                    .setColor("#00FF00")
+                    .setTitle("Server Booster Role Created")
+                    .setThumbnail(interaction.user.displayAvatarURL())
+                    .setFooter({
+                        text: `${interaction.user.tag} | ${interaction.user.id}`,
+                        iconURL: interaction.user.displayAvatarURL()
+                    })
+                    .addFields({
+                        name: "__**Member**__",
+                        value: `${interaction.user}`,
+                        inline: true
+                    }, {
+                        name: "__**Role**__",
+                        value: `${role}`,
+                        inline: true
+                    }, {
+                        name: "__**Color**__",
+                        value: `${color}`,
+                        inline: true
+                    }, {
+                        name: "__**Emoji**__",
+                        value: `${emoji || "None"}`,
+                        inline: true
+                    }, {
+                        name: "__**Icon**__",
+                        value: `${icon || "None"}`,
+                        inline: true
+                    })
+                    .setTimestamp()
+
+                if (logChannel) s(logChannel, "", embed)
+                return re(interaction, `Role ${role} has been created.`).then(() => delr(interaction, 15000));
+            } catch (err) {
+                await role.delete();
+                return re(interaction, `An error occurred while creating the role:\n\`${err}\``).then(() => delr(interaction, 15000));
+            }
         } catch (err) {
-            return er(interaction, `An error occured while trying to ${subCommand} role: \n\`${err}\``, [], []).then(() => delr(interaction, 15000));
+            return re(interaction, `An error occurred while creating the role:\n\`${err}\``).then(() => delr(interaction, 15000));
         }
-    }
-}
-
-async function addRole(interaction, member, role) {
-    const logChannel = interaction.guild.channels.cache.find(c => c.name.includes("action-logs"));
-    await member.roles.add(role.id).then(() => {
-        const embed = new EmbedBuilder()
-            .setColor("#00FF00")
-            .setTitle("Role Added")
-            .setThumbnail(member.user.displayAvatarURL())
-            .setFooter({ text: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
-            .setTimestamp()
-            .addFields({
-                name: "__**Target**__",
-                value: `${member}`,
-                inline: true
-            }, {
-                name: "__**Role**__",
-                value: `${role}`,
-                inline: true
-            }, {
-                name: "__**Moderator**__",
-                value: `${interaction.user}`,
-                inline: true
-            });
-
-        if (logChannel) s(logChannel, "", embed);
-        return er(interaction, `User successfully added to role.`, [], []).then(() => delr(interaction, 15000));
-    });
-}
-
-async function removeRole(interaction, member, role) {
-    const logChannel = interaction.guild.channels.cache.find(c => c.name.includes("action-logs"));
-    await member.roles.remove(role.id).then(() => {
-        const embed = new EmbedBuilder()
-            .setColor("#FF0000")
-            .setTitle("Role Removed")
-            .setThumbnail(member.user.displayAvatarURL())
-            .setFooter({ text: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
-            .setTimestamp()
-            .addFields({
-                name: "__**Target**__",
-                value: `${member}`,
-                inline: true
-            }, {
-                name: "__**Role**__",
-                value: `${role}`,
-                inline: true
-            }, {
-                name: "__**Moderator**__",
-                value: `${interaction.user}`,
-                inline: true
-            });
-
-        if (logChannel) s(logChannel, "", embed);
-        return er(interaction, `User successfully removed from role.`, [], []).then(() => delr(interaction, 15000));
-    });
-}
-
-async function handleInfo(interaction) {
-    const role = interaction.options.getRole('role');
-
-    if (!role || !interaction.guild.roles.cache.has(role.id))
-        return re(interaction, "Please provide a role to check.").then(() => delr(interaction, 7500));
-
-    const embed = new EmbedBuilder()
-        .setColor(`${role.hexColor}`)
-        .setTitle(role.name)
-        .addFields({
-            name: "Role information:",
-            value: `**Role name:** ${role.name}
-            **Role ID:** \`${role.id}\`
-            **Mentionable:** ${role.mentionable}
-            **Hierarchy position:** \`${role.rawPosition + 1}\` (from bottom up)
-            **Number of users in role:** \`${role.members.size}\``
-        })
-        .setTimestamp()
-
-    return r(interaction, '', embed).then(() => delr(interaction, 30000));
-}
-
-async function handleUsers(interaction) {
-    const role = interaction.options.getRole('role');
-
-    if (!role || !interaction.guild.roles.cache.has(role.id))
-        return re(interaction, "Please provide a role to check.").then(() => delr(interaction, 7500));
-
-    const guildRole = await interaction.guild.roles.fetch(role.id);
-    const members = guildRole.members.map(m => m);
-    const embed = new EmbedBuilder()
-        .setColor(guildRole.color)
-        .setTitle(`${guildRole.name}: ${guildRole.members.size} members`)
-        .setTimestamp()
-
-    const array = members.map(member => `${member.user.username} (\`${member.user.id}\`)`);
-
-    if (array.length === 0) {
-        embed.addFields({ name: "Role Members", value: "No members found." });
-        return r(interaction, "", embed).then(() => delr(interaction, 30000));
-    } else if (array.length <= 10) {
-        array.forEach((user, index) => {
-            embed.addFields({ name: `Role Member: ${index + 1}`, value: `${user}` });
-        });
-        return r(interaction, '', embed).then(() => delr(interaction, 30000));
-    } else {
-        await r(interaction, "", embed);
-        return pageList(interaction, array, embed, "Role Members:", 10, 0);
     }
 }
