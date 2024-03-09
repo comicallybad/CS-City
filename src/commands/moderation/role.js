@@ -7,8 +7,7 @@ module.exports = {
         .setDescription("SERVER BOOSTERS - Create your own role.")
         .addStringOption(option => option.setName("name").setDescription("The name of the role.").setMinLength(1).setMaxLength(64).setRequired(true))
         .addStringOption(option => option.setName("color").setDescription("The hex color of the role.").setRequired(true))
-        .addStringOption(option => option.setName("emoji").setDescription("The unicode emoji of the role."))
-        .addStringOption(option => option.setName("icon").setDescription("The icon URL of the role.")),
+        .addStringOption(option => option.setName("emoji").setDescription("The unicode emoji of the role.")),
     execute: async (interaction) => {
         if (!interaction.member.permissions.has(PermissionFlagsBits.ManageRoles) && !interaction.member.roles.cache.find(role => role.name.includes("Server Booster")))
             return re(interaction, "You don't have permission to manage roles.").then(() => delr(interaction, 15000));
@@ -16,7 +15,6 @@ module.exports = {
         const name = interaction.options.getString("name");
         const color = interaction.options.getString("color");
         const emoji = interaction.options.getString("emoji") || undefined;
-        const icon = interaction.options.getString("icon") || undefined;
         const logChannel = interaction.guild.channels.cache.find(channel => channel.name.includes("member-logs"));
 
         if (!color.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/))
@@ -29,7 +27,7 @@ module.exports = {
                 permissions: [],
                 mentionable: false,
                 hoist: false,
-                position: interaction.member.roles.highest.position - 1,
+                position: interaction.guild.roles.cache.find(role => role.id === "1172713390683205642").position - 1,
                 reason: `Server Booster role created by ${interaction.user.tag} | ${interaction.user.id}.`
             });
 
@@ -38,7 +36,6 @@ module.exports = {
 
             try {
                 if (emoji) await role.setUnicodeEmoji(emoji);
-                if (icon) await role.setIcon(icon);
 
                 await interaction.member.roles.add(role);
 
@@ -65,10 +62,6 @@ module.exports = {
                     }, {
                         name: "__**Emoji**__",
                         value: `${emoji || "None"}`,
-                        inline: true
-                    }, {
-                        name: "__**Icon**__",
-                        value: `${icon || "None"}`,
                         inline: true
                     })
                     .setTimestamp()
