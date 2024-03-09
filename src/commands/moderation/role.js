@@ -15,7 +15,7 @@ module.exports = {
         const name = interaction.options.getString("name");
         const color = interaction.options.getString("color");
         const emoji = interaction.options.getString("emoji") || undefined;
-        const logChannel = interaction.guild.channels.cache.find(channel => channel.name.includes("member-logs"));
+        const logChannel = interaction.guild.channels.cache.find(channel => channel.name.includes("role-logs"));
 
         if (!color.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/))
             return re(interaction, "Invalid hex color.").then(() => delr(interaction, 15000));
