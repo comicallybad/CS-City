@@ -61,6 +61,10 @@ module.exports = {
                         value: `${role}`,
                         inline: true
                     }, {
+                        name: "__**Role Name**__",
+                        value: `${name}`,
+                        inline: true
+                    }, {
                         name: "__**Color**__",
                         value: `${color}`,
                         inline: true
