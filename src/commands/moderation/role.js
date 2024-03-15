@@ -39,7 +39,7 @@ module.exports = {
 
                 interaction.member.roles.cache.forEach(async r => {
                     if (r.members.size <= 1)
-                        await r.delete().catch(err => err)
+                        await r.delete().catch(err => err);
                 });
 
                 await interaction.member.roles.add(role);
