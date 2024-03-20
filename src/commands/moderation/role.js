@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, AuditLogEvent } = require("discord.js");
 const { s, re, delr } = require("../../../utils/functions/functions.js");
 
 module.exports = {
@@ -37,28 +37,59 @@ module.exports = {
             try {
                 if (emoji) await role.setUnicodeEmoji(emoji);
 
-                interaction.member.roles.cache.forEach(async r => {
-                    if (r.members.size <= 1)
-                        await r.delete().catch(err => err);
+                const fetchedLogs = await interaction.guild.fetchAuditLogs({
+                    type: AuditLogEvent.RoleCreate,
+                    user: interaction.guild.members.me,
                 });
 
-                await interaction.member.roles.add(role);
-
+                const roleLogs = fetchedLogs.entries.map(role => role.target.id)
                 const embed = new EmbedBuilder()
-                    .setColor("#00FF00")
-                    .setTitle("Server Booster Role Created")
+                    .setColor("#FF0000")
+                    .setTitle("Server Booster Role Deleted")
                     .setThumbnail(interaction.user.displayAvatarURL())
                     .setFooter({
                         text: `${interaction.user.tag} | ${interaction.user.id}`,
                         iconURL: interaction.user.displayAvatarURL()
                     })
-                    .addFields({
+                    .setTimestamp()
+
+                interaction.member.roles.cache.forEach(async r => {
+                    if (!roleLogs.includes(r.id)) return;
+
+                    embed.setFields({
+                        name: "__**Member**__",
+                        value: `${interaction.user}`,
+                        inline: true
+                    }, {
+                        name: "__**Role ID**__",
+                        value: `${r.id}`,
+                        inline: true
+                    }, {
+                        name: "__**Role Name**__",
+                        value: `${r.name}`,
+                        inline: true
+                    })
+
+                    if (logChannel) s(logChannel, "", embed)
+                    await r.delete().catch(err => err);
+                });
+
+                await interaction.member.roles.add(role);
+
+                embed
+                    .setColor("#00FF00")
+                    .setTitle("Server Booster Role Created")
+                    .setFields({
                         name: "__**Member**__",
                         value: `${interaction.user}`,
                         inline: true
                     }, {
                         name: "__**Role**__",
                         value: `${role}`,
+                        inline: true
+                    }, {
+                        name: "__**Role ID**__",
+                        value: `${role.id}`,
                         inline: true
                     }, {
                         name: "__**Role Name**__",
@@ -73,7 +104,6 @@ module.exports = {
                         value: `${emoji || "None"}`,
                         inline: true
                     })
-                    .setTimestamp()
 
                 if (logChannel) s(logChannel, "", embed)
                 return re(interaction, `Role ${role} has been created.`).then(() => delr(interaction, 15000));
