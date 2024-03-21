@@ -2,8 +2,8 @@ const { EmbedBuilder } = require('discord.js');
 const { s } = require('../../../utils/functions/functions.js');
 
 module.exports = async (client, oldMessage, newMessage) => {
+    if (!newMessage.guild || !newMessage.author) return;
     if (newMessage.author.bot) return;
-    if (!newMessage.guild) return;
     if (newMessage.content === oldMessage.content) return;
 
     const target = newMessage.author || oldMessage.author;
