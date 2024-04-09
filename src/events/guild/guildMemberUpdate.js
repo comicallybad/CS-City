@@ -3,6 +3,7 @@ const { s } = require("../../../utils/functions/functions.js");
 
 module.exports = async (client, oldMember, newMember) => {
     if (oldMember.premiumSince === newMember.premiumSince) return;
+    if (newMember.roles.cache.find(role => role.name.includes("Booster"))) return;
     const logChannel = newMember.guild.channels.cache.find(channel => channel.name.includes("role-logs"));
     const fetchedLogs = await newMember.guild.fetchAuditLogs({
         type: AuditLogEvent.RoleCreate,
