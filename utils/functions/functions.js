@@ -59,7 +59,11 @@ module.exports = {
             components: (components && components.components?.length > 0 ? [components] : [])
         };
 
-        return channel.send(reply);
+        try {
+            return await channel.send(reply);
+        } catch (error) {
+            console.error("Stack trace:", new Error().stack);
+        }
     },
 
     //Reply ephemeral
@@ -79,7 +83,11 @@ module.exports = {
             ephemeral: true
         };
 
-        return interaction.reply(reply);
+        try {
+            return await interaction.reply(reply);
+        } catch (error) {
+            console.error("Stack trace:", new Error().stack);
+        }
     },
 
     //Reply
@@ -98,12 +106,16 @@ module.exports = {
             components: (components && components.components?.length > 0 ? [components] : [])
         };
 
-        return interaction.reply(reply);
+        try {
+            return await interaction.reply(reply);
+        } catch (error) {
+            console.error("Stack trace:", new Error().stack);
+        }
     },
 
     //Edit
     e: async function (message, content, embeds, components) {
-        if (!message) return;
+        if (!message || !message.id) return;
         if (!content && !embeds && !components) return;
         const channelPermissions = message.channel.permissionsFor(message.guild.members.me) || null;
         if (!channelPermissions?.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages])) return;
@@ -117,7 +129,11 @@ module.exports = {
             components: (components && components.components?.length > 0 ? [components] : [])
         };
 
-        return message.edit(reply);
+        try {
+            return await message.edit(reply);
+        } catch (error) {
+            console.error("Stack trace:", new Error().stack);
+        }
     },
 
     //Edit reply
@@ -137,7 +153,11 @@ module.exports = {
             components: (components && components.components?.length > 0 ? [components] : [])
         };
 
-        return interaction.editReply(reply)
+        try {
+            return await interaction.editReply(reply);;
+        } catch (error) {
+            console.error("Stack trace:", new Error().stack);
+        }
     },
 
     //Creates a collector for an interaction and returns the result
