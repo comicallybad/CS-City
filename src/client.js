@@ -9,6 +9,13 @@ const intents = [
 ];
 const client = new Client({ intents: intents, partials: [Partials.GuildMember, Partials.Reaction, Partials.Channel, Partials.Message] });
 
+client.music = new Manager({
+    nodes: [{ host: "localhost", port: 2333, password: process.env.ERELA }], send: (id, payload) => {
+        const guild = client.guilds.cache.get(id);
+        if (guild) guild.shard.send(payload);
+    }
+});
+
 config({ path: __dirname + "/.env" });
 global.voiceChannels = [], global.warnUsers = [];
 
@@ -16,7 +23,7 @@ client.commands = new Collection();
 client.aliases = new Collection();
 client.categories = new fs.readdirSync("./src/commands/");
 
-["command", "event"].forEach(x => require(`./handlers/${x}`)(client));
+["command", "event", "erela"].forEach(x => require(`./handlers/${x}`)(client));
 require(`./handlers/error`)(client, process);
 
 client.setMaxListeners(25);
