@@ -1,5 +1,6 @@
 const { Client, Collection, GatewayIntentBits, Partials } = require("discord.js");
 const { config } = require("dotenv");
+const { Manager } = require("erela.js");
 const fs = require("fs");
 
 const intents = [
