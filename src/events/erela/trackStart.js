@@ -3,8 +3,11 @@ const { s, del } = require("../../../utils/functions/functions.js");
 const humanizeDuration = require("humanize-duration");
 
 module.exports = async (client, player, track) => {
-    const channel = await client.channels.fetch(player.textChannel);
-    const guild = await client.guilds.fetch(player.guild);
+    const channel = await client.channels.fetch(player.textChannel) || undefined;
+    const guild = await client.guilds.fetch(player.guild) || undefined;
+
+    if (!channel || !guild) return;
+
     const embed = new EmbedBuilder()
         .setAuthor({ name: "Now Playing!", iconURL: guild.iconURL() })
         .setThumbnail(track.thumbnail ? track.thumbnail : guild.iconURL())
@@ -73,17 +76,21 @@ function createControlRows() {
     return [row1, row2];
 }
 
-function createControlCollector(message) {
+function createControlCollector(message, player) {
     if (!message || !message.id) return;
     const rows = createControlRows();
-    const filter = i => ["🔈", "⏯", "⏮", "⏭", "🔀", "🔁", "🔂", "⏹"].includes(i.customId);
+    const filter = i => {
+        const voiceChannel = i.member.voice.channel;
+        return ["🔈", "⏯", "⏮", "⏭", "🔀", "🔁", "🔂", "⏹"].includes(i.customId) &&
+            voiceChannel && voiceChannel.id === player.voiceChannel;
+    };
     message.edit({ components: rows });
     return message.createMessageComponentCollector({ filter });
 }
 
 function controls(message, embed, player, track) {
     if (!message || !message.id) return;
-    const collector = createControlCollector(message);
+    const collector = createControlCollector(message, player);
     collector.on("collect", (reaction) => {
         reaction.deferUpdate();
         const reacted = reaction.customId;
@@ -116,17 +123,21 @@ function createVolumeRow() {
     return row;
 }
 
-function createVolumeCollector(message) {
+function createVolumeCollector(message, player) {
     if (!message || !message.id) return;
     const row = createVolumeRow();
-    const filter = i => ["🔉", "🔊", "🎵", "📈"].includes(i.customId);
+    const filter = i => {
+        const voiceChannel = i.member.voice.channel;
+        return ["🔉", "🔊", "🎵", "📈"].includes(i.customId) &&
+            voiceChannel && voiceChannel.id === player.voiceChannel;
+    };
     message.edit({ components: [row] });
     return message.createMessageComponentCollector({ filter });
 }
 
 function volumeControls(message, embed, player, track) {
     if (!message || !message.id) return;
-    const collector = createVolumeCollector(message);
+    const collector = createVolumeCollector(message, player);
     collector.on('collect', (reaction) => {
         reaction.deferUpdate();
         const reacted = reaction.customId;
