@@ -45,11 +45,11 @@
     "ascii-table": "^0.0.9",
     "axios": "^1.6.7",
     "beautify": "^0.0.8",
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.18.0",
     "dotenv": "^16.3.1",
-    "erela.js": "^2.4.0",
-    "humanize-duration": "^3.31.0",
-    "mongoose": "^8.0.2",
+    "humanize-duration": "^3.32.1",
+    "mongoose": "^8.10.1",
+    "moonlink.js": "^4.4.14",
     "word-definition": "^2.1.6"
   }
 }
