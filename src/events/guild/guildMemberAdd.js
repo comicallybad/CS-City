@@ -15,7 +15,7 @@ module.exports = async (client, member) => {
     const userJoinDate = member.user.createdAt;
     const time = currentDate - userJoinDate;
     const userJoinTimestamp = Math.floor(member.user.createdAt.getTime() / 1000);
-    const ONE_MONTH_IN_MS = 2629746000;
+    const THREE_MONTHS_IN_MS = 2629746000 * 3;
 
     const embed = new EmbedBuilder()
         .setColor("#0efefe")
@@ -24,9 +24,18 @@ module.exports = async (client, member) => {
         .setDescription(`${member.user} (${member.user.id})`)
         .setFooter({ text: `${member.user.tag}`, iconURL: member.user.displayAvatarURL() })
         .setTimestamp()
-        .addFields({ name: `${time <= ONE_MONTH_IN_MS ? "**Warning**" : ""} Account Created:`, value: `<t:${userJoinTimestamp}:R>` });
+        .addFields({ name: `${time <= THREE_MONTHS_IN_MS ? "**Warning**" : ""} Account Created:`, value: `<t:${userJoinTimestamp}:R>` });
 
     s(logChannel, '', embed);
+
+    const isNewAccount = time <= THREE_MONTHS_IN_MS;
+    const avatarUrl = member.user.displayAvatarURL();
+    const isDefaultAvatar = /^https:\/\/cdn\.discordapp\.com\/embed\/avatars\/\d+\.png$/.test(avatarUrl);
+
+    if (isNewAccount && isDefaultAvatar) {
+        await member.kick("likely a bot account").catch(() => { });
+        return;
+    }
 
     const exists = await db.findOne({ guildID: guildID }).catch(err => err);
     if (!exists || !exists.channels.find(ch => ch.command == "welcome") || !(exists.welcomeMessage.length > 0)) return;
