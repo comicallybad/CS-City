@@ -535,6 +535,10 @@ export default {
                     } else if (change.key === 'hoist' || change.key === 'mentionable') {
                         oldValue = oldValue ? 'Yes' : 'No';
                         newValue = newValue ? 'Yes' : 'No';
+                    } else if (change.key as string === 'icon') {
+                        const roleId = role?.id;
+                        oldValue = oldValue ? `https://cdn.discordapp.com/role-icons/${roleId}/${oldValue}.png` : 'None';
+                        newValue = newValue ? `https://cdn.discordapp.com/role-icons/${roleId}/${newValue}.png` : 'None';
                     }
 
                     if ((change.key as string) !== 'permissions') {
