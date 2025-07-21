@@ -35,7 +35,7 @@ export default {
 
         await deferReply(interaction, { flags: MessageFlags.Ephemeral });
 
-        const boosterRolePosition = interaction.guild.roles.cache.find(role => role.id === "1172713390683205642")?.position ?? 1;
+        const boosterRolePosition = interaction.guild.roles.cache.find(role => role.id === "1172713390683205642")?.position ?? 25;
 
         const role = await interaction.guild.roles.create({
             name: name,
