@@ -56,12 +56,18 @@ export default {
                 const iconId = match ? match[1] : icon;
 
                 if (urlMatch) {
-                    await role.setIcon(urlMatch[0]);
+                    try {
+                        await role.setIcon(urlMatch[0]);
+                    } catch (error) {
+                        await role.delete().catch(() => { });
+                        throw new ValidationError("Invalid icon URL. Please try again with a different URL.");
+                    }
                 } else {
                     const fetchEmoji = interaction.guild.emojis.cache.find(e => e.name === icon || e.id === iconId);
                     if (fetchEmoji) {
                         await role.setIcon(fetchEmoji.url);
                     } else {
+                        await role.delete().catch(() => { });
                         throw new ValidationError("Invalid emoji or icon URL.");
                     }
                 }
