@@ -3,7 +3,6 @@ import * as dotenv from "dotenv";
 import mongoose from "mongoose";
 import { setupGuilds } from "../../utils/dbUtils";
 import { initializeActivities } from "../../utils/activityUtils";
-import { ValidationError } from "../../utils/customErrors";
 import { formatLogTimestamp } from "../../utils/logUtils";
 
 dotenv.config();
@@ -16,14 +15,8 @@ export default {
 
         initializeActivities(client);
 
-        if (!process.env.CLIENT_ID) {
-            throw new ValidationError("CLIENT_ID environment variable is not set.");
-        }
-
-        client.music.init(process.env.CLIENT_ID);
-
         mongoose.set("strictQuery", true);
-        mongoose.connect("mongodb://0.0.0.0/CS-City").then(() => {
+        mongoose.connect("mongodb://0.0.0.0/ComicallyBot").then(() => {
             console.log(`${formatLogTimestamp()} [SUCCESS] MongoDB connection established.`);
             setupGuilds(client);
         });
