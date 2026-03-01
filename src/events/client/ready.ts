@@ -16,7 +16,7 @@ export default {
         initializeActivities(client);
 
         mongoose.set("strictQuery", true);
-        mongoose.connect("mongodb://0.0.0.0/ComicallyBot").then(() => {
+        mongoose.connect("mongodb://0.0.0.0/CS-City").then(() => {
             console.log(`${formatLogTimestamp()} [SUCCESS] MongoDB connection established.`);
             setupGuilds(client);
         });
