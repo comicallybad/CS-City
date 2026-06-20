@@ -41,7 +41,12 @@ client.music = new Manager({
         port: 2333,
         secure: false
     }],
-    options: {},
+    options: {
+        resume: true,
+        search: {
+            playlistLoadLimit: 500
+        },
+    },
 });
 
 client.music.use(new Connectors.DiscordJs(), client);
