@@ -50,8 +50,8 @@ async function handleChatInputCommand(client: Client, interaction: Interaction) 
             const errorStack = error instanceof Error ? error.stack : "No stack trace available";
 
             const errorLog = {
-                time: time.toLocaleString('en-US', {
-                    month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true
+                time: time.toLocaleString("en-US", {
+                    month: "numeric", day: "numeric", year: "numeric", hour: "numeric", minute: "numeric", second: "numeric", hour12: true
                 }),
                 command: interaction.commandName,
                 subcommand: interaction.options.getSubcommand(false) || null,
@@ -103,6 +103,7 @@ async function handleMessageComponent(client: Client, interaction: Interaction) 
     const messageOwnerId = customId.split("-")[1];
     const isOwnerOfMessage = messageOwnerId === interaction.user.id;
     const hasManageMessages = interaction.inGuild() && interaction.member instanceof GuildMember && interaction.member.permissions.has(PermissionFlagsBits.ManageMessages);
+
 
     if (customId.startsWith("music-")) {
         return handleMusicInteraction(interaction as ButtonInteraction, client);

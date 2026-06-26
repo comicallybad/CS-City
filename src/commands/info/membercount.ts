@@ -3,9 +3,9 @@ import { sendReply } from "../../utils/replyUtils";
 
 export default {
     data: new SlashCommandBuilder()
-        .setName('membercount')
+        .setName("membercount")
         .setContexts(InteractionContextType.Guild)
-        .setDescription('Displays the guild member count.'),
+        .setDescription("Displays the guild member count."),
     execute: async (interaction: ChatInputCommandInteraction) => {
         const guild = interaction.guild!;
 

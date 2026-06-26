@@ -149,11 +149,11 @@ function buildReputationEmbed(
 function formatRecentReputations(reputations: ReputationData[]): string {
     return "```diff\n" +
         reputations.slice(0, 5).map(rep => {
-            let position = '';
+            let position = "";
             if (rep.trade_position === 1) {
-                position = ' (1st)';
+                position = " (1st)";
             } else if (rep.trade_position === 2) {
-                position = ' (2nd)';
+                position = " (2nd)";
             }
             return `${rep.rate === 1 ? "+" : "-"}${position} ${rep.body}`;
         }).join("\n") + "\n```";
@@ -163,7 +163,7 @@ async function getSteamID(input: string): Promise<string> {
     if (input.match(/^\d+$/)) {
         return input;
     } if (input.includes("steamcommunity.com/profiles/")) {
-        return input.replace(/\D/g, '');
+        return input.replace(/\D/g, "");
     } else if (input.includes("steamcommunity.com/id/")) {
         const vanityURL = getSteamIDFromVanity(input);
         if (!process.env.STEAM) {
@@ -179,7 +179,7 @@ async function getSteamID(input: string): Promise<string> {
         return res.data.response.steamid;
     } else if (input.includes("steamcommunity.com/tradeoffer/new/?partner=")) {
         const tradeUrl = input;
-        const accountId = new URL(tradeUrl).searchParams.get('partner');
+        const accountId = new URL(tradeUrl).searchParams.get("partner");
         if (!accountId) {
             throw new ValidationError("Invalid Trade URL: Could not extract partner ID.");
         }
@@ -195,10 +195,10 @@ async function getSteamID(input: string): Promise<string> {
 }
 
 function getSteamIDFromVanity(url: string): string {
-    const parsedUrl = new URL(url, 'https://steamcommunity.com');
-    const pathParts = parsedUrl.pathname.split('/');
+    const parsedUrl = new URL(url, "https://steamcommunity.com");
+    const pathParts = parsedUrl.pathname.split("/");
 
-    if (pathParts[1] === 'id' && pathParts[2])
+    if (pathParts[1] === "id" && pathParts[2])
         return pathParts[2];
 
     throw new ValidationError("Invalid Vanity URL format.");
@@ -232,7 +232,7 @@ async function getSteamLevel(steamID: string): Promise<number> {
 
 async function getBanStatus(steamID: string): Promise<BanStatus> {
     try {
-        const response = await axios.post<BanStatus>('https://api.csgo-rep.com/', {
+        const response = await axios.post<BanStatus>("https://api.csgo-rep.com/", {
             id: "206",
             query: {
                 steam_id: `${steamID}`
@@ -246,7 +246,7 @@ async function getBanStatus(steamID: string): Promise<BanStatus> {
 
 async function getReputation(steamID: string): Promise<ReputationResponse> {
     try {
-        const response = await axios.post<ReputationResponse>('https://api.csgo-rep.com/', {
+        const response = await axios.post<ReputationResponse>("https://api.csgo-rep.com/", {
             id: "204",
             query: {
                 filter: {
