@@ -5,8 +5,8 @@ import { deletePlayerState } from "../../utils/dbUtils";
 export default {
     name: "queueEnd",
     execute: async (client: Client, player: Player) => {
-        await deletePlayerState(player.guildId);
+        // await deletePlayerState(player.guildId);
 
-        if (!player.autoPlay) await player.destroy();
+        // if (!player.autoPlay) await player.destroy();
     },
 };
