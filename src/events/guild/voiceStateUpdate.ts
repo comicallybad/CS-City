@@ -25,7 +25,7 @@ export default {
                         await player.destroy();
                     }
                     disconnectTimers.delete(oldChannel.id);
-                }, 180000); // 3 minutes
+                }, 60000 * 20); // 20 minutes
 
                 disconnectTimers.set(oldChannel.id, timer);
             }
