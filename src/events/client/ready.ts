@@ -10,7 +10,7 @@ dotenv.config();
 export default {
     name: "ready",
     once: true,
-    execute(client: Client) {
+    async execute(client: Client) {
         console.log(`${formatLogTimestamp()} [INFO] ${client.user?.tag} (${client.user?.id}) online on shard ${client.shard?.ids[0]}.`);
 
         initializeActivities(client);
@@ -20,5 +20,11 @@ export default {
             console.log(`${formatLogTimestamp()} [SUCCESS] MongoDB connection established.`);
             setupGuilds(client);
         });
+
+        for (const guild of client.guilds.cache.values()) {
+            await guild.members.fetch().catch((error: unknown) => {
+                console.error(`${formatLogTimestamp()} [ERROR] Failed to fetch members for guild ${guild.name} (${guild.id}): ${(error as Error).message}`);
+            });
+        }
     },
 };
